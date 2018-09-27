@@ -4,7 +4,14 @@ import './App.css';
 
 class Neighborhood extends Component {
   generateColor() {
-      return '#' +  Math.random().toString(16).substr(-6);
+      // random shade of green (ala grass)
+      var max = 150;
+      var min = 100;
+      var green = Math.floor(Math.random() * (max - min + 1)) + min;
+      return `rgb(0, ${green}, 0)`;
+      
+      // random color in the hexadecimal range
+      // return '#' +  Math.random().toString(16).substr(-6);
   }
 
   render() {
@@ -14,8 +21,8 @@ class Neighborhood extends Component {
       padding: 0,
       backgroundColor: this.generateColor(),
       display: "inline-block",
-      WebkitFilter: "drop-shadow(0px 0px 5px #666)",
-      filter: "drop-shadow(0px 0px 5px #666)"
+      // WebkitFilter: "drop-shadow(0px 0px 5px #666)",
+      // filter: "drop-shadow(0px 0px 5px #666)"
     };
 
     var homes = [];

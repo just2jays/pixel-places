@@ -3,28 +3,35 @@ import Neighborhood from './Neighborhood'
 import './App.css';
 
 class Town extends Component {
-    render() {
-        var cardStyle = {
-            height: 500,
-            width: 500,
-            padding: 0,
-            backgroundColor: "#999",
-            WebkitFilter: "drop-shadow(0px 0px 5px #666)",
-            filter: "drop-shadow(0px 0px 5px #666)",
-            fontSize: 0
-        };
+  constructor(props) {
+    super(props);
+    
+    this.state = {
 
-        var homes = [];
-        for (var i = 0; i < 25; i++) {
-            homes.push(<Neighborhood key={i}></Neighborhood>);
-        }
+    };
+  }
+  render() {
+    var cardStyle = {
+      height: 500,
+      width: 500,
+      padding: 0,
+      backgroundColor: "#999",
+      WebkitFilter: "drop-shadow(0px 0px 5px #666)",
+      filter: "drop-shadow(0px 0px 5px #666)",
+      fontSize: 0
+    };
 
-        return(
-            <div style={cardStyle}  className="town">
-                {homes}
-            </div>
-        );
+    var homes = [];
+    for (var i = 0; i < 25; i++) {
+      homes.push(<Neighborhood key={i} />);
     }
+
+    return(
+      <div style={cardStyle}  className="town">
+        {homes}
+      </div>
+    );
+  }
 }
 
 export default Town;

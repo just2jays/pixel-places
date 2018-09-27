@@ -4,6 +4,7 @@ import './App.css';
 class House extends Component {
   constructor(props){
     super(props);
+    
     this.state = {
       lightsOn: Math.random() >= 0.5,
       lightColor: this.generateColor()
