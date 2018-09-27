@@ -21,14 +21,14 @@ class Town extends Component {
       fontSize: 0
     };
 
-    var homes = [];
+    var neighborhoods = [];
     for (var i = 0; i < 25; i++) {
-      homes.push(<Neighborhood key={i} />);
+      neighborhoods.push(<Neighborhood key={i} />);
     }
 
     return(
       <div style={cardStyle}  className="town">
-        {homes}
+        {neighborhoods}
       </div>
     );
   }
