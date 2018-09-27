@@ -1,17 +1,40 @@
 import React, { Component } from 'react';
+import random from 'lodash/random';
 import './App.css';
 
 class House extends Component {
   constructor(props){
     super(props);
     
+    var lightsOn = random(1);
+
     this.state = {
-      lightsOn: Math.random() >= 0.5,
-      lightColor: this.generateColor()
+      lightsOn: lightsOn,
+      lightColor: this.generateColor(),
+      ownerAwake: lightsOn ? true : false
     };
 
+    this.checkAwakeTimeout = undefined;
+    this.checkAwakeEvery = random(100, 1000); // milliseconds
+    
     // bindings
     this.toggleLights = this.toggleLights.bind(this);
+    this.checkOwnersAwake = this.checkOwnersAwake.bind(this);
+  }
+
+  componentDidMount() {
+    this.checkOwnersAwake();
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.lightInterval);
+  }
+
+  checkOwnersAwake() {
+    if(random(1)){
+      this.toggleLights();
+    }
+    setTimeout( this.checkOwnersAwake, random(1, 10000));
   }
 
   generateColor() {
