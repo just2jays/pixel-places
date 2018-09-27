@@ -8,26 +8,26 @@ class Neighborhood extends Component {
   }
 
   render() {
-      var cardStyle = {
-          height: 100,
-          width: 100,
-          padding: 0,
-          backgroundColor: this.generateColor(),
-          display: "inline-block",
-          WebkitFilter: "drop-shadow(0px 0px 5px #666)",
-          filter: "drop-shadow(0px 0px 5px #666)"
-      };
+    var cardStyle = {
+      height: 100,
+      width: 100,
+      padding: 0,
+      backgroundColor: this.generateColor(),
+      display: "inline-block",
+      WebkitFilter: "drop-shadow(0px 0px 5px #666)",
+      filter: "drop-shadow(0px 0px 5px #666)"
+    };
 
-      var homes = [];
-      for (var i = 0; i < 100; i++) {
-          homes.push(<House key={i}></House>);
-      }
+    var homes = [];
+    for (var i = 0; i < 100; i++) {
+      homes.push(<House key={i} />);
+    }
 
-      return(
-          <div style={cardStyle}  className="neighborhood">
-              {homes}
-          </div>
-      );
+    return(
+      <div style={cardStyle}  className="neighborhood">
+        {homes}
+      </div>
+    );
   }
 }
 
