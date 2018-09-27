@@ -21,8 +21,7 @@ class Neighborhood extends Component {
       padding: 0,
       backgroundColor: this.generateColor(),
       display: "inline-block",
-      // WebkitFilter: "drop-shadow(0px 0px 5px #666)",
-      // filter: "drop-shadow(0px 0px 5px #666)"
+      cursor: "crosshair"
     };
 
     var homes = [];

@@ -1,25 +1,32 @@
 import React, { Component } from 'react';
 import random from 'lodash/random';
-import './App.css';
+import Tooltip from './Tooltip';
+import './House.css';
 
 class House extends Component {
   constructor(props){
     super(props);
     
     var lightsOn = random(1);
+    var ownsTelevision = random(1);
 
     this.state = {
       lightsOn: lightsOn,
       lightColor: this.generateColor(),
-      ownerAwake: lightsOn ? true : false
+      ownsTelevision: ownsTelevision,
+      showingInfo: false
     };
 
     this.checkAwakeTimeout = undefined;
-    this.checkAwakeEvery = random(100, 1000); // milliseconds
+
+    // refs
+    this.tooltip = React.createRef();
     
     // bindings
     this.toggleLights = this.toggleLights.bind(this);
     this.checkOwnersAwake = this.checkOwnersAwake.bind(this);
+    this.showHouseInfo = this.showHouseInfo.bind(this);
+    this.hideHouseInfo = this.hideHouseInfo.bind(this);
   }
 
   componentDidMount() {
@@ -50,21 +57,47 @@ class House extends Component {
     })
   }
 
+  showHouseInfo() {
+    this.setState({
+      showingInfo: true
+    });
+  }
+
+  hideHouseInfo() {
+    this.setState({
+      showingInfo: false
+    });
+  }
+
   render() {
-    var squareStyle = {
+    const squareStyle = {
+      position: 'relative',
       height: 6,
       width: 6,
       display: "inline-block",
       margin: 2,
-      backgroundColor: this.state.lightsOn ? this.state.lightColor : '#000'
+      backgroundColor: this.state.lightsOn ? this.state.lightColor : '#000',
     }
 
+    const tooltipStyle = {
+      display: this.state.showingInfo ? 'inline-block' : 'none'
+    }
+    
     return(
-      <div
-        className={`house`}
-        style={squareStyle}
-        onClick={this.toggleLights}
-      />
+      <React.Fragment>
+        <div
+          className={`house`}
+          style={squareStyle}
+          onClick={this.toggleLights}
+          onMouseOver={this.showHouseInfo}
+          onMouseOut={this.hideHouseInfo}
+        />
+        <div className="tooltip-container" style={tooltipStyle}>
+          <Tooltip>
+            <div>Awake: {this.state.lightsOn ? '👀' : '💤'}</div>
+          </Tooltip>
+        </div>
+      </React.Fragment>
     );
   }
 }
