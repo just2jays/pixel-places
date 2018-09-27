@@ -27,14 +27,17 @@ class House extends Component {
   }
 
   componentWillUnmount() {
-    clearTimeout(this.lightInterval);
+    clearTimeout(this.checkAwakeTimeout);
   }
 
   checkOwnersAwake() {
     if(random(1)){
       this.toggleLights();
     }
-    setTimeout( this.checkOwnersAwake, random(1, 10000));
+    this.checkAwakeTimeout = setTimeout(
+      this.checkOwnersAwake,
+      random(1, 10000)
+    );
   }
 
   generateColor() {
