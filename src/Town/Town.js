@@ -10,7 +10,10 @@ class Town extends Component {
       neighborhoods: []
     };
 
+    // refs
     this.townElement = React.createRef();
+
+    // bindings
   }
 
   componentDidMount() {
