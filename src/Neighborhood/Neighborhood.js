@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import House from './House';
+import House from '../House/House';
 import isEmpty from 'lodash/isEmpty';
-import './App.css';
+import './Neighborhood.css';
 
 class Neighborhood extends Component {
   constructor(props){

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import random from 'lodash/random';
-import Tooltip from './Tooltip';
+import Tooltip from '../Tooltip/Tooltip';
 import './House.css';
 
 class House extends Component {
