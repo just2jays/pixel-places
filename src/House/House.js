@@ -33,7 +33,13 @@ class House extends Component {
     this.checkOwnersAwake();
   }
 
+  componentDidUpdate(){
+    // Notify the neighborhood of a change in a home
+    this.props.houseChanged(this.state);
+  }
+
   componentWillUnmount() {
+    // Don't check
     clearTimeout(this.checkAwakeTimeout);
   }
 

@@ -1,0 +1,17 @@
+.neighborhood {
+    position: relative;
+}
+
+.neighborhood-info {
+    display: none;
+    background: orange;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.neighborhood-info.show-info {
+    display: block;
+}
