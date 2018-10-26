@@ -21,7 +21,6 @@ class App extends Component {
   }
 
   onHousesGenerated(houses) {
-    console.log(houses);
     this.setState({
       houses: [...this.state.houses, ...houses]
     })
@@ -34,10 +33,6 @@ class App extends Component {
           onNeighborhoodsGenerated={this.onNeighborhoodsGenerated}
           onHousesGenerated={this.onHousesGenerated}
         />
-        <div className='town-info'>
-          <span># of neighborhoods: {this.state.neighborhoods.length}</span>
-          <span># of houses: {this.state.houses.length}</span>
-        </div>
       </React.Fragment>
     );
   }

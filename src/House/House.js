@@ -63,6 +63,12 @@ class House extends Component {
     })
   }
 
+  turnOffTheLights() {
+    this.setState({
+      lightsOn: false
+    })
+  }
+
   showHouseInfo() {
     this.setState({
       showingInfo: true

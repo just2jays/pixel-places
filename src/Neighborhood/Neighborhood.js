@@ -9,7 +9,8 @@ class Neighborhood extends Component {
     this.state = {
       grassType: this.generateColor(),
       homes: [],
-      showInfo: false
+      showInfo: false,
+      homeRefs: []
     }
 
     this.hoodElement = React.createRef();
@@ -18,11 +19,19 @@ class Neighborhood extends Component {
     this.toggleNeighborhoodInfo = this.toggleNeighborhoodInfo.bind(this);
   }
 
+  setHouseRef = (ref) => {
+    console.log(this.state.homeRefs);
+    this.setState({
+      homeRefs: [...this.state.homeRefs, ref]
+    })
+  }
+
   componentDidMount() {
     let homes = [];
     for (var i = 0; i < 100; i++) {
       homes.push(
         <House
+          ref={this.setHouseRef}
           key={i}
           neighborhood={this.hoodElement}
           houseChanged={this.houseStatusChanged}
@@ -32,8 +41,17 @@ class Neighborhood extends Component {
     this.setState({
       homes: homes
     });
+  }
 
-    this.props.onHousesGenerated(homes);
+  shutOffPower = () => {
+    console.log(this.state.homeRefs);
+    this.state.homeRefs.map((home) => 
+      home.turnOffTheLights()
+    )
+  }
+
+  getHomesWithPowerOn = () => {
+
   }
 
   generateColor() {
@@ -68,8 +86,10 @@ class Neighborhood extends Component {
       cursor: "crosshair",
       backgroundColor: this.state.grassType
     };
-
-    console.log(this.state.homes);
+    
+    this.state.homeRefs.map((house) => {
+      console.log(house.state.lightsOn);
+    })
 
     return(
       <div
