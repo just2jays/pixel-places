@@ -21,7 +21,7 @@ class App extends Component {
   }
 
   onHousesGenerated(houses) {
-    console.log(houses);
+    // console.log(houses);
     this.setState({
       houses: [...this.state.houses, ...houses]
     })
