@@ -32,6 +32,7 @@ class Neighborhood extends Component {
     this.generateStrayAnimal = this.generateStrayAnimal.bind(this);
     this.happinessCheck = this.happinessCheck.bind(this);
     this.strayAnimalCheck = this.strayAnimalCheck.bind(this);
+    this.fetchRandomHouse = this.fetchRandomHouse.bind(this);
 
     // vars
     this.name = this.generateNeighborhoodName();
@@ -40,11 +41,10 @@ class Neighborhood extends Component {
   }
 
   componentDidMount() {
-    this.generateGrass();
-    this.generateHouses(); // Generate initial set of homes
+    this.generateGrass(); // Generate initial neighborhood lawns
+    this.generateHouses(); // Generate initial homes in neighborhood
 
-    // initiate Neighborhood Watch
-    this.neighborhoodWatchPeriod = 5 // every X seconds
+    // initiate "Neighborhood Watch"
     this.neighborhoodWatchTimer = setInterval(
       this.neighborhoodWatch,
       random(1000, 10000) // check again at random interval between immediately and 10 seconds
@@ -78,8 +78,8 @@ class Neighborhood extends Component {
     if(prevState.strayAnimals.length !== this.state.strayAnimals.length) {
       // Handle change in `Neighborhood` stray animals
       (() => {
-        this.props.onUpdate(`There's a stray ${this.state.strayAnimals[this.state.strayAnimals.length - 1].type} wandering around ${this.name}`);
-        this.handleChangeInHappiness();
+        // this.props.onUpdate(`There's a stray ${this.state.strayAnimals[this.state.strayAnimals.length - 1].type} wandering around ${this.name}`);
+        // this.handleChangeInHappiness();
       })();
     }
   }
@@ -138,7 +138,6 @@ class Neighborhood extends Component {
   }
 
   neighborhoodWatch(updatedState){
-    console.log('holla back');
     this.happinessCheck(); // Check for changes in overall Happiness
     this.strayAnimalCheck(); // Check for changes in overall stray animal population
   }
@@ -158,7 +157,6 @@ class Neighborhood extends Component {
   }
 
   strayAnimalCheck() {
-    // "the Jones' have adopted the ___ stray ____ in __________"
     let percentChanceNewStray = 10; // % chance of new stray animal in neighborhood
     let percentChanceAdoption = 10; // % chance a house in neighborhood adopts a stray animal
     
@@ -172,15 +170,17 @@ class Neighborhood extends Component {
       });
     }
 
+    // Check for new adoptions
     if(this.state.strayAnimals.length > 0){
-      // Check for new adoptions
       if(random(1, 100) <= percentChanceAdoption){
         let currentStrays = [...this.state.strayAnimals];
         let adoptedStray = currentStrays.splice(random(currentStrays.length - 1), 1)[0];
         this.setState({
           strayAnimals: currentStrays
         }, () =>{
-          this.props.onUpdate(`The ${adoptedStray.color} ${adoptedStray.type} in ${this.name} has been adopted by ${this.fetchRandomHouse().name}`);
+          let adoptedHouse = this.fetchRandomHouse();
+          adoptedHouse.addNewPet(adoptedStray);
+          this.props.onUpdate(`The ${adoptedStray.color} ${adoptedStray.type} in ${this.name} has been adopted by ${this.fetchRandomHouse().householdName}`);
         });
       }
     }
@@ -199,29 +199,25 @@ class Neighborhood extends Component {
   }
 
   generateGrass() {
-      // Random shade of green (ala grass)
-      var max = 250;
-      var min = 100;
-      var threshold = this.state.overallHappiness/500;
-      var red = Math.floor(threshold * (max - min + 1)) + min;
-      var green = Math.floor(threshold * (max - min + 1)) + min;
+    // Random shade of green (ala grass)
+    var max = 250;
+    var min = 100;
+    var threshold = this.state.overallHappiness/500;
+    var red = Math.floor(threshold * (max - min + 1)) + min;
+    var green = Math.floor(threshold * (max - min + 1)) + min;
 
-      if(this.state.overallHappiness/500 >= 0.5){
-        red = 0;
-      }else {
-        green = 0;
-      }
+    if(this.state.overallHappiness/500 >= 0.5){
+      red = 0;
+    }else {
+      green = 0;
+    }
 
-      this.setState({
-        grassType: `rgb(${red}, ${green}, 0)`
-      });
-      
-      // Random color in the hexadecimal range
-      // return '#' +  Math.random().toString(16).substr(-6);
-  }
-
-  generateTerrain() {
-
+    this.setState({
+      grassType: `rgb(${red}, ${green}, 0)`
+    });
+    
+    // Random color in the hexadecimal range
+    // return '#' +  Math.random().toString(16).substr(-6);
   }
 
   fetchRandomHouse() {
