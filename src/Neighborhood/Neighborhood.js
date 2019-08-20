@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import reduce from 'lodash/reduce';
+import random from 'lodash/random';
 import House from '../House/House';
 import './Neighborhood.css';
 
@@ -8,12 +9,13 @@ class Neighborhood extends Component {
   constructor(props){
     super(props);
     this.state = {
-      grassType: this.generateColor(),
+      grassType: undefined,
       homes: [],
       showInfo: false,
       earningsPerPeriod: '1000',
       powerOn: true,
-      overallHappiness: 5 // on a scale of 1-10
+      overallHappiness: 500, // default `House` happiness value * num of homes in neighborhood
+      strayAnimals: []
     }
 
     // refs
@@ -25,18 +27,86 @@ class Neighborhood extends Component {
     this.increaseEarningsPerPeriod = this.increaseEarningsPerPeriod.bind(this);
     this.decreaseEarningsPerPeriod = this.decreaseEarningsPerPeriod.bind(this);
     this.neighborhoodWatch = this.neighborhoodWatch.bind(this);
+    this.generateGrass = this.generateGrass.bind(this);
+    this.generateStrayAnimal = this.generateStrayAnimal.bind(this);
 
     // vars
+    this.name = this.generateNeighborhoodName();
     this.homeRefs = [];
+    this.happinessThreshold = 0.5; // Threshold to determine happiness
   }
 
   componentDidMount() {
+    this.generateGrass();
     this.generateHouses(); // Generate initial set of homes
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if(
+      this.state.overallHappiness !== nextState.overallHappiness ||
+      this.state.homes !== nextState.homes ||
+      this.state.grassType !== nextState.grassType ||
+      this.state.strayAnimals.length !== nextState.strayAnimals.length
+    ) {
+      return true;
+    }else {
+      return false;
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if(prevState.overallHappiness !== this.state.overallHappiness) {
+      // Handle change in overall `Neighborhood` happiness
+      let changeType = this.state.overallHappiness < prevState.overallHappiness ? 'increased' : 'decreased';
+      let overall = this.state.overallHappiness/500 >= 0.5 ? 'happy' : 'sad';
+      (() => {
+        this.props.onUpdate(`${this.name} ${changeType} in sadness and is overall ${overall}`)
+        this.handleChangeInHappiness();
+      })();
+    }
+
+    if(prevState.strayAnimals.length !== this.state.strayAnimals.length) {
+      // Handle change in `Neighborhood` stray animals
+      (() => {
+        this.props.onUpdate(`There's a stray ${this.state.strayAnimals[this.state.strayAnimals.length - 1].type} wandering around ${this.name}`);
+        this.handleChangeInHappiness();
+      })();
+    }
   }
 
   establishHomeReference = (ref) => {
     this.homeRefs.push(ref); // Create array of `House` references
   };
+
+  handleChangeInHappiness() {
+    this.generateGrass();
+  }
+
+  generateNeighborhoodName() {
+    let preName = [
+      'Rama',
+      'Tama',
+      'Sama',
+      'Wala',
+      'Kimi'
+    ];
+    let midName = [
+      'nala',
+      'pili',
+      'nuli',
+      'lama',
+      'geeta'
+    ];
+    let postName = [
+      'luts',
+      'runa',
+      'kata',
+      'paga',
+      'duna'
+    ];
+
+    return preName[random(preName.length-1)]+midName[random(midName.length-1)]+postName[random(postName.length-1)];
+  }
 
   generateHouses() {
     let homes = [];
@@ -58,25 +128,54 @@ class Neighborhood extends Component {
   }
 
   neighborhoodWatch(updatedState){
+    // Get sum of overall happiness of all `Houses` in `Neighborhood`
     let overallHappiness;
-    overallHappiness = reduce(this.homeRefs, (home, n) => {
-      console.log(home, n);
-      return 0;
+    overallHappiness = reduce(this.homeRefs, function(sum, house) {
+      return sum + house.state.happiness;
     }, 0);
-    console.log(overallHappiness);
+
+    if(overallHappiness !== this.state.overallHappiness) {
+      this.setState({
+        overallHappiness: overallHappiness
+      });
+    }
   }
 
-  generateColor() {
+  generateStrayAnimal(){
+    let animal = {
+      type: 'cat'
+    };
+
+    this.setState({
+      strayAnimals: [...this.state.strayAnimals, animal]
+    });
+  }
+
+  generateGrass() {
       // Random shade of green (ala grass)
-      var max = 150;
+      var max = 250;
       var min = 100;
-      var green = Math.floor(Math.random() * (max - min + 1)) + min;
-      return `rgb(0, ${green}, 0)`;
+      var threshold = this.state.overallHappiness/500;
+      var red = Math.floor(threshold * (max - min + 1)) + min;
+      var green = Math.floor(threshold * (max - min + 1)) + min;
+
+      if(this.state.overallHappiness/500 >= 0.5){
+        red = 0;
+      }else {
+        green = 0;
+      }
+
+      this.setState({
+        grassType: `rgb(${red}, ${green}, 0)`
+      });
       
       // Random color in the hexadecimal range
       // return '#' +  Math.random().toString(16).substr(-6);
   }
 
+  generateTerrain() {
+
+  }
 
   toggleNeighborhoodInfo(){
     this.setState({
@@ -113,7 +212,7 @@ class Neighborhood extends Component {
         ref={this.hoodElement}
         style={cardStyle} 
         className="neighborhood"
-        onClick={this.toggleNeighborhoodInfo}
+        // onClick={this.toggleNeighborhoodInfo}
       >
         {this.state.homes}
         <div className={`neighborhood-info ${this.state.showInfo ? 'show-info' : ''}`}>

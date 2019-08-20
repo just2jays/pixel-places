@@ -1,22 +1,20 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import random from 'lodash/random';
-import Tooltip from '../Tooltip/Tooltip';
+// import Tooltip from '../Tooltip/Tooltip';
 import './House.css';
 
 class House extends Component {
   constructor(props){
     super(props);
-    
-    var lightsOn = random(1);
-    var ownsTelevision = random(1);
 
     this.state = {
-      size: 3,
-      lightsOn: lightsOn,
-      lightColor: this.generateColor(),
-      ownsTelevision: ownsTelevision,
-      showingInfo: false,
-      happiness: 5 // on a scale of 1-10
+      numberOfResidents: random(1, 5), // (int) size of family in the house
+      lightsOn: random(1), // (bool) lights are "on"
+      lightColor: this.generateColor(), // hex color value of light display
+      ownsTelevision: random(1), // (bool) tv allowed in the household
+      happiness: 5, // (int) overall happiness of the house on a scale of 1-10
+      showingInfo: false
     };
 
     this.checkAwakeTimeout = undefined;
@@ -32,10 +30,13 @@ class House extends Component {
     this.getHappiness = this.getHappiness.bind(this);
     this.increaseHappiness = this.increaseHappiness.bind(this);
     this.decreaseHappiness = this.decreaseHappiness.bind(this);
+
+    // vars
+    this.householdName = this.generateHouseholdName();
   }
 
   componentDidMount() {
-    this.checkOwnersAwake();
+    // this.checkOwnersAwake();
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -55,6 +56,31 @@ class House extends Component {
     clearTimeout(this.checkAwakeTimeout);
   }
 
+  generateHouseholdName() {
+    let preName = [
+      'Gr',
+      'At',
+      'Br',
+      'St',
+      'Pl'
+    ];
+    let midName = [
+      'and',
+      'on',
+      'essa',
+      'ara'
+    ];
+    let postName = [
+      'hana',
+      'ka',
+      'la',
+      'ha',
+      'ra'
+    ];
+
+    return `The ${preName[random(preName.length-1)]+midName[random(midName.length-1)]+postName[random(postName.length-1)]}s`;
+  }
+
   checkOwnersAwake() {
     let percentChanceAwake = 10; // ...out of a random integer between 1-100
     if(random(1, 100) <= percentChanceAwake){
@@ -66,7 +92,10 @@ class House extends Component {
     );
   }
 
-  getState
+  /*
+  * RESIDENTS
+  */
+  getNumberOfResidents = () => this.state.numberOfResidents;
 
   /*
   * HAPPINESS
@@ -80,7 +109,7 @@ class House extends Component {
     }
 
     this.setState({
-      happiness: (this.state.happiness + 1)
+      happiness: (this.state.happiness + 100)
     });
   }
   decreaseHappiness(level) {
@@ -89,7 +118,7 @@ class House extends Component {
     }
 
     this.setState({
-      happiness: (this.state.happiness - 1)
+      happiness: (this.state.happiness - 100)
     });
   }
 
@@ -100,8 +129,12 @@ class House extends Component {
   /*
   * LIGHTS
   */
-  getLightStatus() {
-    return this.state.lightsOn ? 'on' : 'off';
+  getLights() {
+    const { lightsOn, lightColor } = this.state;
+    return {
+      status: lightsOn ? 'on' : 'off',
+      color: lightColor
+    }
   }
   toggleLights() {
     this.setState({
@@ -148,21 +181,25 @@ class House extends Component {
     
     return(
       <div
-        ref={this.props.establishHouseReference}
         className={`house`}
         style={squareStyle}
         onClick={this.toggleLights}
-        onMouseOver={this.showHouseInfo}
-        onMouseOut={this.hideHouseInfo}
+        // onMouseOver={this.showHouseInfo}
+        // onMouseOut={this.hideHouseInfo}
       >
-        <div className="tooltip-container" style={tooltipStyle}>
+        {/* <div className="tooltip-container" style={tooltipStyle}>
           <Tooltip>
             <div>Awake: {this.state.lightsOn ? '👀' : '💤'}</div>
           </Tooltip>
-        </div>
+        </div> */}
       </div>
     );
   }
+}
+
+House.propTypes = {
+  onUpdate: PropTypes.func,
+  
 }
 
 export default House;

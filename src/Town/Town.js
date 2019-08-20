@@ -8,12 +8,16 @@ class Town extends Component {
     super(props);
     
     this.state = {
-      neighborhoods: []
+      neighborhoods: [],
+      events: []
     };
 
     // binds
     this.generateNeighborhoods = this.generateNeighborhoods.bind(this);
     this.powerOutage = this.powerOutage.bind(this);
+    this.windsOfChange = this.windsOfChange.bind(this);
+    this.tellTheTown = this.tellTheTown.bind(this);
+    this.takeChance = this.takeChance.bind(this);
 
     // vars
     this.neighborhoodsPerTown = 25;
@@ -25,24 +29,15 @@ class Town extends Component {
     this.generateNeighborhoods();
   }
 
-  // componentWillUnmount() {
-  //   // Don't check
-  //   clearTimeout(this.checkAwakeTimeout);
-  // }
-
   establishNeighborhoodReference = (ref) => {
     this.neighborhoodRefs.push(ref);
   };
 
-  // set() {
-  //   if(random(1)){
-  //     this.toggleLights();
-  //   }
-  //   this.checkAwakeTimeout = setTimeout(
-  //     this.checkOwnersAwake,
-  //     random(1, 10000)
-  //   );
-  // }
+  tellTheTown(event) {
+    this.setState({
+      events: [...this.state.events, event]
+    });
+  }
 
   generateNeighborhoods() {
     let neighborhoods = [];
@@ -52,6 +47,7 @@ class Town extends Component {
           ref={this.establishNeighborhoodReference}
           key={i}
           onHoodChange={this.townChanged}
+          onUpdate={this.tellTheTown}
           {...this.props}
         />
       );
@@ -63,30 +59,54 @@ class Town extends Component {
     this.props.onNeighborhoodsGenerated(neighborhoods);
   }
 
-  getAllNeighborhoods() {
-
-  }
-
-  getOverallHappiness() {
-
-  }
-
+  /*
+  * TOWN EXPERIMENTS
+  */
   powerOutage() {
     this.neighborhoodRefs[random(this.neighborhoodsPerTown - 1)].homeRefs.forEach((home, index) => {
       home.turnOffLights();
     });
   }
 
+  windsOfChange() {
+    let randomHood = this.neighborhoodRefs[random(this.neighborhoodsPerTown - 1)];
+    let randomHome = randomHood.homeRefs[randomHood.homeRefs.length - 1];
+    let goodWinds = random() ? true : false;
+    if(goodWinds) {
+      randomHome.increaseHappiness();
+    }else{
+      randomHome.decreaseHappiness();
+    }
+  }
+
+  takeChance() {
+    let randomHood = this.neighborhoodRefs[random(this.neighborhoodsPerTown - 1)];
+    randomHood.generateStrayAnimal();
+  }
+
   render() {
-    console.log(this.neighborhoodRefs);
     return(
-      <div className="town-container">
-        {this.state.neighborhoods}
-        <p className="basic-control-panel" style={{marginTop: '20px'}}>
-          <button onClick={this.powerOutage}>hahaha!</button>
-        </p>
+      <div className="globe">
+        <div className="town-container">
+          {this.state.neighborhoods}
+          <div className="basic-control-panel" style={{marginTop: '40px'}}>
+            <button onClick={this.windsOfChange}>How are you?</button>
+            <button onClick={this.powerOutage}>Oops...</button>
+            <button onClick={this.takeChance}>Chance!</button>
+          </div>
+        </div>
+        <div className="town-crier">
+          <ul>
+          {
+            this.state.events.slice(0).reverse().map((event, index) => {
+              return (
+                <li>{event}</li>
+              );
+            })
+          }
+          </ul>
+        </div>
       </div>
-      
     );
   }
 }

@@ -29,16 +29,10 @@ class App extends Component {
 
   render() {
     return (
-      <React.Fragment>
-        <Town
-          onNeighborhoodsGenerated={this.onNeighborhoodsGenerated}
-          onHousesGenerated={this.onHousesGenerated}
-        />
-        <div className='town-info'>
-          <span># of neighborhoods: {this.state.neighborhoods.length}</span>
-          <span># of houses: {this.state.houses.length}</span>
-        </div>
-      </React.Fragment>
+      <Town
+        onNeighborhoodsGenerated={this.onNeighborhoodsGenerated}
+        onHousesGenerated={this.onHousesGenerated}
+      />
     );
   }
 }
