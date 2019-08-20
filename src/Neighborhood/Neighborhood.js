@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import reduce from 'lodash/reduce';
 import random from 'lodash/random';
+import sample from 'lodash/sample';
 import House from '../House/House';
 import './Neighborhood.css';
 
@@ -29,6 +30,8 @@ class Neighborhood extends Component {
     this.neighborhoodWatch = this.neighborhoodWatch.bind(this);
     this.generateGrass = this.generateGrass.bind(this);
     this.generateStrayAnimal = this.generateStrayAnimal.bind(this);
+    this.happinessCheck = this.happinessCheck.bind(this);
+    this.strayAnimalCheck = this.strayAnimalCheck.bind(this);
 
     // vars
     this.name = this.generateNeighborhoodName();
@@ -39,6 +42,13 @@ class Neighborhood extends Component {
   componentDidMount() {
     this.generateGrass();
     this.generateHouses(); // Generate initial set of homes
+
+    // initiate Neighborhood Watch
+    this.neighborhoodWatchPeriod = 5 // every X seconds
+    this.neighborhoodWatchTimer = setInterval(
+      this.neighborhoodWatch,
+      random(1000, 10000) // check again at random interval between immediately and 10 seconds
+    );
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -60,7 +70,7 @@ class Neighborhood extends Component {
       let changeType = this.state.overallHappiness < prevState.overallHappiness ? 'increased' : 'decreased';
       let overall = this.state.overallHappiness/500 >= 0.5 ? 'happy' : 'sad';
       (() => {
-        this.props.onUpdate(`${this.name} ${changeType} in sadness and is overall ${overall}`)
+        this.props.onUpdate(`${this.name} ${changeType} in sadness and is overall ${overall}`);
         this.handleChangeInHappiness();
       })();
     }
@@ -128,6 +138,12 @@ class Neighborhood extends Component {
   }
 
   neighborhoodWatch(updatedState){
+    console.log('holla back');
+    this.happinessCheck(); // Check for changes in overall Happiness
+    this.strayAnimalCheck(); // Check for changes in overall stray animal population
+  }
+
+  happinessCheck() {
     // Get sum of overall happiness of all `Houses` in `Neighborhood`
     let overallHappiness;
     overallHappiness = reduce(this.homeRefs, function(sum, house) {
@@ -141,14 +157,45 @@ class Neighborhood extends Component {
     }
   }
 
-  generateStrayAnimal(){
-    let animal = {
-      type: 'cat'
-    };
+  strayAnimalCheck() {
+    // "the Jones' have adopted the ___ stray ____ in __________"
+    let percentChanceNewStray = 10; // % chance of new stray animal in neighborhood
+    let percentChanceAdoption = 10; // % chance a house in neighborhood adopts a stray animal
+    
+    // Check for new strays
+    if(random(1, 100) <= percentChanceNewStray){
+      let strayAnimal = this.generateStrayAnimal();
+      this.setState({
+        strayAnimals: [...this.state.strayAnimals, strayAnimal]
+      }, () =>{
+        this.props.onUpdate(`A ${strayAnimal.color} ${strayAnimal.type} is loose in ${this.name}`);
+      });
+    }
 
-    this.setState({
-      strayAnimals: [...this.state.strayAnimals, animal]
-    });
+    if(this.state.strayAnimals.length > 0){
+      // Check for new adoptions
+      if(random(1, 100) <= percentChanceAdoption){
+        let currentStrays = [...this.state.strayAnimals];
+        let adoptedStray = currentStrays.splice(random(currentStrays.length - 1), 1)[0];
+        this.setState({
+          strayAnimals: currentStrays
+        }, () =>{
+          this.props.onUpdate(`The ${adoptedStray.color} ${adoptedStray.type} in ${this.name} has been adopted by ${this.fetchRandomHouse().name}`);
+        });
+      }
+    }
+  }
+
+  generateStrayAnimal(){
+    // Generate a random stray animal
+    let animalType = ['cat', 'dog', 'lizard', 'ostrich'];
+    let animalColor = ['red', 'yellow', 'brown', 'green'];
+    let strayAnimal = {
+      type: sample(animalType),
+      color: sample(animalColor)
+    }
+
+    return strayAnimal;
   }
 
   generateGrass() {
@@ -175,6 +222,10 @@ class Neighborhood extends Component {
 
   generateTerrain() {
 
+  }
+
+  fetchRandomHouse() {
+    return sample(this.homeRefs);
   }
 
   toggleNeighborhoodInfo(){

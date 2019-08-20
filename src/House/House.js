@@ -10,6 +10,7 @@ class House extends Component {
 
     this.state = {
       numberOfResidents: random(1, 5), // (int) size of family in the house
+      pets: [], // (array) pets in the house
       lightsOn: random(1), // (bool) lights are "on"
       lightColor: this.generateColor(), // hex color value of light display
       ownsTelevision: random(1), // (bool) tv allowed in the household
@@ -152,6 +153,16 @@ class House extends Component {
     });
   }
 
+  /*
+  * PETS
+  */
+  addNewPet(pet) {
+    if (typeof pet === 'undefined') return false;
+
+    this.setState({
+      pets: [...this.state.pets, pet]
+    });
+  }
 
   showHouseInfo() {
     this.setState({
