@@ -15,7 +15,8 @@ class House extends Component {
       lightColor: this.generateColor(), // hex color value of light display
       ownsTelevision: random(1), // (bool) tv allowed in the household
       happiness: 5, // (int) overall happiness of the house on a scale of 1-10
-      showingInfo: false
+      showingInfo: false,
+      locationRequested: false
     };
 
     this.checkAwakeTimeout = undefined;
@@ -31,13 +32,10 @@ class House extends Component {
     this.getHappiness = this.getHappiness.bind(this);
     this.increaseHappiness = this.increaseHappiness.bind(this);
     this.decreaseHappiness = this.decreaseHappiness.bind(this);
+    this.locateHouse = this.locateHouse.bind(this);
 
     // vars
     this.householdName = this.generateHouseholdName();
-  }
-
-  componentDidMount() {
-    // this.checkOwnersAwake();
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -164,15 +162,37 @@ class House extends Component {
     });
   }
 
-  showHouseInfo() {
+
+  locateHouse() {
     this.setState({
-      showingInfo: true
+      locationRequested: true
+    }, () => {
+      setTimeout(
+        () => {
+          this.setState({
+            locationRequested: false
+          });
+        }, 5000
+      );
     });
   }
 
-  hideHouseInfo() {
+  showHouseInfo(event) {
+    console.log('A',event.target);
+
+    this.setState({
+      showingInfo: true
+    }, () =>{
+
+    });
+  }
+
+  hideHouseInfo(event) {
+    console.log('B',event.target);
     this.setState({
       showingInfo: false
+    }, () =>{
+      
     });
   }
 
@@ -185,25 +205,38 @@ class House extends Component {
       margin: 2,
       backgroundColor: this.state.lightsOn ? this.state.lightColor : '#000',
     }
-
-    const tooltipStyle = {
-      display: this.state.showingInfo ? 'inline-block' : 'none'
-    }
     
     return(
-      <div
-        className={`house`}
-        style={squareStyle}
-        onClick={this.toggleLights}
-        // onMouseOver={this.showHouseInfo}
-        // onMouseOut={this.hideHouseInfo}
-      >
-        {/* <div className="tooltip-container" style={tooltipStyle}>
-          <Tooltip>
-            <div>Awake: {this.state.lightsOn ? '👀' : '💤'}</div>
-          </Tooltip>
-        </div> */}
-      </div>
+      <React.Fragment>
+        {this.state.showingInfo &&
+          <div className='house-info'>
+            <div
+              className='close-button'
+              onClick={this.hideHouseInfo}
+            >
+              X
+            </div>
+            <h3>{this.householdName}</h3>
+            {this.state.pets.length &&
+              <React.Fragment>
+                <div className="house-stat label">Pets</div>
+                <ul>
+                  {
+                    this.state.pets.map((pet, index) => {
+                      return <li className="house-stat value">{pet.type}</li>
+                    })
+                  }
+                </ul>
+              </React.Fragment>
+            }
+          </div>
+        }
+        <div
+          className={`house ${this.state.locationRequested ? 'house-blinking' : ''}`}
+          style={squareStyle}
+          onClick={this.showHouseInfo}
+        />
+      </React.Fragment>
     );
   }
 }

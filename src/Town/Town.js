@@ -98,9 +98,19 @@ class Town extends Component {
         <div className="town-crier">
           <ul>
           {
-            this.state.events.slice(0).reverse().map((event, index) => {
+            this.state.events.slice(0).reverse().map((eventObject, index) => {
               return (
-                <li>{event}</li>
+                <li
+                  // data-neighborhood={event.neighborhood}
+                  onClick={() => {
+                    eventObject.neighborhood.locateNeighborhood();
+                    if(typeof eventObject.house !== 'undefined'){
+                      eventObject.house.locateHouse();
+                    }
+                  }}
+                >
+                  {eventObject.message}
+                </li>
               );
             })
           }

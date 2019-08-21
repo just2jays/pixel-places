@@ -16,7 +16,8 @@ class Neighborhood extends Component {
       earningsPerPeriod: '1000',
       powerOn: true,
       overallHappiness: 500, // default `House` happiness value * num of homes in neighborhood
-      strayAnimals: []
+      strayAnimals: [],
+      locationRequested: false
     }
 
     // refs
@@ -33,6 +34,8 @@ class Neighborhood extends Component {
     this.happinessCheck = this.happinessCheck.bind(this);
     this.strayAnimalCheck = this.strayAnimalCheck.bind(this);
     this.fetchRandomHouse = this.fetchRandomHouse.bind(this);
+    this.locateNeighborhood = this.locateNeighborhood.bind(this);
+    this.removeNeighborhoodLocator = this.removeNeighborhoodLocator.bind(this);
 
     // vars
     this.name = this.generateNeighborhoodName();
@@ -56,7 +59,8 @@ class Neighborhood extends Component {
       this.state.overallHappiness !== nextState.overallHappiness ||
       this.state.homes !== nextState.homes ||
       this.state.grassType !== nextState.grassType ||
-      this.state.strayAnimals.length !== nextState.strayAnimals.length
+      this.state.strayAnimals.length !== nextState.strayAnimals.length ||
+      this.state.locationRequested !== nextState.locationRequested
     ) {
       return true;
     }else {
@@ -70,7 +74,10 @@ class Neighborhood extends Component {
       let changeType = this.state.overallHappiness < prevState.overallHappiness ? 'increased' : 'decreased';
       let overall = this.state.overallHappiness/500 >= 0.5 ? 'happy' : 'sad';
       (() => {
-        this.props.onUpdate(`${this.name} ${changeType} in sadness and is overall ${overall}`);
+        this.props.onUpdate({
+          neighborhood: this,
+          message: `${this.name} ${changeType} in sadness and is overall ${overall}`
+        });
         this.handleChangeInHappiness();
       })();
     }
@@ -166,7 +173,11 @@ class Neighborhood extends Component {
       this.setState({
         strayAnimals: [...this.state.strayAnimals, strayAnimal]
       }, () =>{
-        this.props.onUpdate(`A ${strayAnimal.color} ${strayAnimal.type} is loose in ${this.name}`);
+        // this.props.onUpdate(`A ${strayAnimal.color} ${strayAnimal.type} is loose in ${this.name}`);
+        this.props.onUpdate({
+          neighborhood: this,
+          message: `A ${strayAnimal.color} ${strayAnimal.type} is loose in ${this.name}`
+        });
       });
     }
 
@@ -180,7 +191,12 @@ class Neighborhood extends Component {
         }, () =>{
           let adoptedHouse = this.fetchRandomHouse();
           adoptedHouse.addNewPet(adoptedStray);
-          this.props.onUpdate(`The ${adoptedStray.color} ${adoptedStray.type} in ${this.name} has been adopted by ${this.fetchRandomHouse().householdName}`);
+          // this.props.onUpdate(`The ${adoptedStray.color} ${adoptedStray.type} in ${this.name} has been adopted by ${this.fetchRandomHouse().householdName}`);
+          this.props.onUpdate({
+            house: adoptedHouse,
+            neighborhood: this,
+            message: `The ${adoptedStray.color} ${adoptedStray.type} in ${this.name} has been adopted by ${this.fetchRandomHouse().householdName}`
+          });
         });
       }
     }
@@ -242,6 +258,26 @@ class Neighborhood extends Component {
     });
   }
 
+  locateNeighborhood() {
+    this.setState({
+      locationRequested: true
+    }, () => {
+      setTimeout(
+        () => {
+          this.setState({
+            locationRequested: false
+          });
+        }, 5000
+      );
+    });
+  }
+
+  removeNeighborhoodLocator() {
+    this.setState({
+      locationRequested: false
+    });
+  }
+
   render() {
     if(isEmpty(this.state.homes)) return null;
 
@@ -251,7 +287,8 @@ class Neighborhood extends Component {
       padding: 0,
       display: "inline-block",
       cursor: "crosshair",
-      backgroundColor: this.state.grassType
+      backgroundColor: this.state.grassType,
+      filter: this.state.locationRequested ? 'brightness(0.6)' : 'initial'
     };
 
     return(
@@ -259,7 +296,7 @@ class Neighborhood extends Component {
         ref={this.hoodElement}
         style={cardStyle} 
         className="neighborhood"
-        // onClick={this.toggleNeighborhoodInfo}
+        onClick={this.removeNeighborhoodLocator}
       >
         {this.state.homes}
         <div className={`neighborhood-info ${this.state.showInfo ? 'show-info' : ''}`}>
