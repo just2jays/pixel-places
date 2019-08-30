@@ -9,24 +9,30 @@ class Town extends Component {
     
     this.state = {
       neighborhoods: [],
-      events: []
+      events: [],
+      simSpeed: 1 // speed of simulation (1 = normal/real-time)
     };
-
+    
     // binds
     this.generateNeighborhoods = this.generateNeighborhoods.bind(this);
     this.powerOutage = this.powerOutage.bind(this);
     this.windsOfChange = this.windsOfChange.bind(this);
     this.tellTheTown = this.tellTheTown.bind(this);
     this.takeChance = this.takeChance.bind(this);
+    this.increaseSimSpeed = this.increaseSimSpeed.bind(this);
 
     // vars
-    this.neighborhoodsPerTown = 25;
+    this.neighborhoodsPerTown = 2;
     this.defaultTimePeriod = 1000; // milliseconds per period (lower == faster progress)
     this.neighborhoodRefs = [];
   }
 
   componentDidMount() {
-    this.generateNeighborhoods();
+    this.generateNeighborhoods(); // generate initial neighborhoods
+  }
+
+  componentDidUpdate() {
+    console.log(`TOWN UPDATED speed to ${this.state.simSpeed}!`);
   }
 
   establishNeighborhoodReference = (ref) => {
@@ -39,6 +45,17 @@ class Town extends Component {
     });
   }
 
+  increaseSimSpeed() {
+    if(this.state.simSpeed >=5) {
+      console.log('Sim speed at max (5x)');
+      return false;
+    }
+
+    this.setState({
+      simSpeed: this.state.simSpeed + 1
+    });
+  }
+
   generateNeighborhoods() {
     let neighborhoods = [];
     for (var i = 0; i < this.neighborhoodsPerTown; i++) {
@@ -46,7 +63,8 @@ class Town extends Component {
         <Neighborhood
           ref={this.establishNeighborhoodReference}
           key={i}
-          onHoodChange={this.townChanged}
+          town={this}
+          simSpeed={this.state.simSpeed}
           onUpdate={this.tellTheTown}
           {...this.props}
         />
@@ -93,6 +111,12 @@ class Town extends Component {
             <button onClick={this.windsOfChange}>How are you?</button>
             <button onClick={this.powerOutage}>Oops...</button>
             <button onClick={this.takeChance}>Chance!</button>
+            <div>
+              <div>Simulation Speed: <span>{this.state.simSpeed}</span></div>
+              <div>
+                <button onClick={this.increaseSimSpeed}>></button>
+              </div>
+            </div>
           </div>
         </div>
         <div className="town-crier">

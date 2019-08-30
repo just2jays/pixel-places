@@ -35,7 +35,12 @@ class House extends Component {
     this.locateHouse = this.locateHouse.bind(this);
 
     // vars
+    this.neighborhood = props.neighborhood;
     this.householdName = this.generateHouseholdName();
+  }
+
+  componentDidMount() {
+    // do nothing for now...
   }
 
   shouldComponentUpdate(nextProps, nextState) {

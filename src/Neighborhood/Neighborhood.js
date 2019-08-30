@@ -38,29 +38,35 @@ class Neighborhood extends Component {
     this.removeNeighborhoodLocator = this.removeNeighborhoodLocator.bind(this);
 
     // vars
+    this.town = props.town;
     this.name = this.generateNeighborhoodName();
     this.homeRefs = [];
     this.happinessThreshold = 0.5; // Threshold to determine happiness
+    this.neighborhoodWatchInterval = 60000; // Interval to run neighborhood watch (in milliseconds)
   }
 
   componentDidMount() {
     this.generateGrass(); // Generate initial neighborhood lawns
     this.generateHouses(); // Generate initial homes in neighborhood
 
+    
+
     // initiate "Neighborhood Watch"
     this.neighborhoodWatchTimer = setInterval(
       this.neighborhoodWatch,
-      random(1000, 10000) // check again at random interval between immediately and 10 seconds
+      (this.neighborhoodWatchInterval/this.town.state.simSpeed)  // next check interval (in milliseconds)
     );
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    console.log(this.props.simSpeed,nextProps.simSpeed);
     if(
       this.state.overallHappiness !== nextState.overallHappiness ||
       this.state.homes !== nextState.homes ||
       this.state.grassType !== nextState.grassType ||
       this.state.strayAnimals.length !== nextState.strayAnimals.length ||
-      this.state.locationRequested !== nextState.locationRequested
+      this.state.locationRequested !== nextState.locationRequested ||
+      this.props.simSpeed !== nextProps.simSpeed
     ) {
       return true;
     }else {
@@ -69,6 +75,10 @@ class Neighborhood extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    if(prevProps.simSpeed !== this.props.simSpeed) {
+      console.log('sim speed changed!');
+    }
+
     if(prevState.overallHappiness !== this.state.overallHappiness) {
       // Handle change in overall `Neighborhood` happiness
       let changeType = this.state.overallHappiness < prevState.overallHappiness ? 'increased' : 'decreased';
@@ -132,7 +142,7 @@ class Neighborhood extends Component {
         <House
           ref={this.establishHomeReference}
           key={i}
-          neighborhood={this.hoodElement}
+          neighborhood={this}
           onUpdate={this.neighborhoodWatch}
         />
       );
