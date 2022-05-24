@@ -156,6 +156,15 @@ class House extends Component {
     });
   }
 
+
+  turnOffTheLights() {
+    this.setState({
+      lightsOn: false
+    })
+  }
+
+  showHouseInfo() {
+
   /*
   * PETS
   */
@@ -184,6 +193,7 @@ class House extends Component {
 
   showHouseInfo(event) {
     console.log('A',event.target);
+
 
     this.setState({
       showingInfo: true

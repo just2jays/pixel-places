@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import random from 'lodash/random';
 import Neighborhood from '../Neighborhood/Neighborhood';
+import sample from 'lodash/sample';
+import { Button } from 'semantic-ui-react'
 import './Town.css';
 
 class Town extends Component {
@@ -20,11 +22,18 @@ class Town extends Component {
     this.tellTheTown = this.tellTheTown.bind(this);
     this.takeChance = this.takeChance.bind(this);
     this.increaseSimSpeed = this.increaseSimSpeed.bind(this);
+    this.neighborhoodsPerTown = 25;
+    this.neighborhoodRefs = [];
+  }
+
+  setNeighborhoodRef = (ref) => {
+    this.neighborhoodRefs.push(ref);
 
     // vars
     this.neighborhoodsPerTown = 2;
     this.defaultTimePeriod = 1000; // milliseconds per period (lower == faster progress)
     this.neighborhoodRefs = [];
+
   }
 
   componentDidMount() {
@@ -61,7 +70,7 @@ class Town extends Component {
     for (var i = 0; i < this.neighborhoodsPerTown; i++) {
       neighborhoods.push(
         <Neighborhood
-          ref={this.establishNeighborhoodReference}
+          ref={this.setNeighborhoodRef}
           key={i}
           town={this}
           simSpeed={this.state.simSpeed}
@@ -73,8 +82,19 @@ class Town extends Component {
     this.setState({
       neighborhoods: neighborhoods
     });
+  }
 
-    this.props.onNeighborhoodsGenerated(neighborhoods);
+  randomNeighborhoodPowerOutage = () => {
+    let randomHood = sample(this.neighborhoodRefs);
+    console.log(randomHood);
+    randomHood.shutOffPower();
+  }
+
+  totalEnergyUsage = () => {
+    let totalEnergy = 0;
+    this.neighborhoodRefs.map((hood) => {
+      totalEnergy += hood.getHomesWithPowerOn();
+    })
   }
 
   /*
@@ -104,43 +124,24 @@ class Town extends Component {
 
   render() {
     return(
-      <div className="globe">
+      <React.Fragment>
         <div className="town-container">
           {this.state.neighborhoods}
-          <div className="basic-control-panel" style={{marginTop: '40px'}}>
-            <button onClick={this.windsOfChange}>How are you?</button>
-            <button onClick={this.powerOutage}>Oops...</button>
-            <button onClick={this.takeChance}>Chance!</button>
-            <div>
-              <div>Simulation Speed: <span>{this.state.simSpeed}</span></div>
-              <div>
-                <button onClick={this.increaseSimSpeed}>></button>
-              </div>
-            </div>
-          </div>
         </div>
-        <div className="town-crier">
-          <ul>
-          {
-            this.state.events.slice(0).reverse().map((eventObject, index) => {
-              return (
-                <li
-                  // data-neighborhood={event.neighborhood}
-                  onClick={() => {
-                    eventObject.neighborhood.locateNeighborhood();
-                    if(typeof eventObject.house !== 'undefined'){
-                      eventObject.house.locateHouse();
-                    }
-                  }}
-                >
-                  {eventObject.message}
-                </li>
-              );
-            })
-          }
-          </ul>
+        <div className="town-info-bar">
+          <p># of Neighborhoods:</p>
+          <p># of Homes:</p>
+          <p>Power being used:</p>
         </div>
-      </div>
+        <div className="control-panel">
+          <Button
+            onClick={this.randomNeighborhoodPowerOutage}
+          >
+            <span role="img" aria-label="lightning-bolt">⚡️</span>Random Power Outage
+          </Button>
+        </div>
+      </React.Fragment>
+
     );
   }
 }

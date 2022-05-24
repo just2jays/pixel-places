@@ -21,7 +21,6 @@ class App extends Component {
   }
 
   onHousesGenerated(houses) {
-    // console.log(houses);
     this.setState({
       houses: [...this.state.houses, ...houses]
     })
@@ -29,10 +28,12 @@ class App extends Component {
 
   render() {
     return (
-      <Town
-        onNeighborhoodsGenerated={this.onNeighborhoodsGenerated}
-        onHousesGenerated={this.onHousesGenerated}
-      />
+      <React.Fragment>
+        <Town
+          onNeighborhoodsGenerated={this.onNeighborhoodsGenerated}
+          onHousesGenerated={this.onHousesGenerated}
+        />
+      </React.Fragment>
     );
   }
 }

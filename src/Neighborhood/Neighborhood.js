@@ -13,6 +13,7 @@ class Neighborhood extends Component {
       grassType: undefined,
       homes: [],
       showInfo: false,
+      homeRefs: []
       earningsPerPeriod: '1000',
       powerOn: true,
       overallHappiness: 500, // default `House` happiness value * num of homes in neighborhood
@@ -43,6 +44,13 @@ class Neighborhood extends Component {
     this.homeRefs = [];
     this.happinessThreshold = 0.5; // Threshold to determine happiness
     this.neighborhoodWatchInterval = 60000; // Interval to run neighborhood watch (in milliseconds)
+  }
+
+  setHouseRef = (ref) => {
+    console.log(this.state.homeRefs);
+    this.setState({
+      homeRefs: [...this.state.homeRefs, ref]
+    })
   }
 
   componentDidMount() {
@@ -140,7 +148,8 @@ class Neighborhood extends Component {
     for (var i = 0; i < 100; i++) {
       homes.push(
         <House
-          ref={this.establishHomeReference}
+
+          ref={this.setHouseRef}
           key={i}
           neighborhood={this}
           onUpdate={this.neighborhoodWatch}
@@ -150,8 +159,17 @@ class Neighborhood extends Component {
     this.setState({
       homes: homes
     });
+  }
 
-    this.props.onHousesGenerated(homes);
+  shutOffPower = () => {
+    console.log(this.state.homeRefs);
+    this.state.homeRefs.map((home) => 
+      home.turnOffTheLights()
+    )
+  }
+
+  getHomesWithPowerOn = () => {
+
   }
 
   neighborhoodWatch(updatedState){
@@ -300,6 +318,12 @@ class Neighborhood extends Component {
       backgroundColor: this.state.grassType,
       filter: this.state.locationRequested ? 'brightness(0.6)' : 'initial'
     };
+
+    
+    this.state.homeRefs.map((house) => {
+      console.log(house.state.lightsOn);
+    })
+
 
     return(
       <div
